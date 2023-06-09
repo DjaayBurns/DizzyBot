@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Bot</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div id="chat-container">
+    <div id="chat-log"></div>
+    <div id="user-input">
+      <input type="text" id="input-text" placeholder="Type your message..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const apiUrl = 'https://api.openai.com/v1/chat/completions';
+    const apiKey = 'your-openai-api-key';
+
+    async function sendMessage() {
+      const inputElement = document.getElementById('input-text');
+      const userInput = inputElement.value.trim();
+
+      if (userInput !== '') {
+        const response = await axios.post(apiUrl, {
+          'messages': [
+            {'role': 'system', 'content': 'You'},
+            {'role': 'user', 'content': userInput}
+          ]
+        }, {
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const botResponse = response.data.choices[0].message.content;
+        appendMessage('Bot', botResponse);
+
+        inputElement.value = '';
+      }
+    }
+
+    function appendMessage(role, message) {
+      const chatLog = document.getElementById('chat-log');
+      const messageElement = document.createElement('div');
+      messageElement.className = role.toLowerCase();
+      messageElement.innerText = `${role}: ${message}`;
+      chatLog.appendChild(messageElement);
+    }
+  </script>
+</body>
+</html>
